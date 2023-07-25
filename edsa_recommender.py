@@ -31,6 +31,8 @@ import streamlit as st
 # Data handling dependencies
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
+import plotly.express as px 
 
 # Custom Libraries
 from utils.data_loader import load_movie_titles
@@ -38,6 +40,7 @@ from recommenders.collaborative_based import collab_model
 from recommenders.content_based import content_model
 import base64
 from pathlib import Path
+
 
 def img_to_bytes(img_path):
     img_bytes = Path(img_path).read_bytes()
@@ -57,7 +60,7 @@ def main():
 
     # DO NOT REMOVE the 'Recommender System' option below, however,
     # you are welcome to add more options to enrich your app.
-    page_options = ["Recommender System","Solution Overview","About Us","App Feedback"]
+    page_options = ["Recommender System","Solution Overview","About Us","App Feedback","Analytics"]
 
     # -------------------------------------------------------------------
     # ----------- !! THIS CODE MUST NOT BE ALTERED !! -------------------
@@ -245,6 +248,103 @@ So, why settle for generic movie suggestions when you can have a tailored cinema
                     feedback_additional_3 = st.checkbox('Functionality')
                     feedback_additional_4 = st.checkbox('Other')
             submit_feedback = st.form_submit_button("Submit Feedback")
+    if page_selection == "Analytics":
+        st.title("Uncovering Data Insights")
+        #Movie ratings Histogram
+        st.markdown("""<h4 style="text-align: center;">Movie Ratings Distribution</h4><p style="text-align: center;"></p>""", unsafe_allow_html=True)
+        hist_data = pd.read_csv('resources/data/train.csv')
+        
+        fig, ax = plt.subplots()
+        ax.hist(hist_data['rating'],rwidth=0.99,color = "Purple")
+        st.pyplot(fig)
+        
+        st.subheader("Most Rated Overall Movies")
+        df_ratings = pd.read_csv('resources/data/df_ratings.csv', encoding = "latin_1")
+        top_movies = df_ratings.head(25)
+        bottom_movies = df_ratings.tail(25)
+
+        st.markdown("""<h4 style="text-align: center;">25 Most Rated Movies</h4><p style="text-align: center;"></p>""", unsafe_allow_html=True)
+        fig_top_movies=px.bar(top_movies,x='Reviews',y='Title', orientation='h')
+        fig_top_movies.update_traces(marker_color='gold',  # Change the bar color
+                      textfont_color='black',  # Change the label text color
+                      hovertemplate='<b>Title: %{y}</b><br><b>Review Count: %{x}</b>',  # Change the tooltip text
+                      selector=dict(type='bar'))  # Select only the bar traces
+        st.write(fig_top_movies)
+
+        st.subheader("Genre Distribution and Average ratings")
+        #Donut Chart
+        st.markdown("""<h4 style="text-align: center;">Genre Distribution</h4><p style="text-align: center;"></p>""", unsafe_allow_html=True)
+        df_genre_freq = pd.read_csv("resources/data/PieChartData.csv")
+        labels = df_genre_freq["Genres"]
+        sizes = df_genre_freq["Frequency"]
+        fig1, ax1 = plt.subplots()
+        ax1.pie(sizes, labels=labels, autopct='%0.1f%%',
+                shadow=False, startangle=0,labeldistance = 1.05,pctdistance = 0.67,textprops={'fontsize': 5.9})
+        ax1.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
+        circle = plt.Circle( (0,0), 0.75, color='white')
+        p=plt.gcf()
+        p.gca().add_artist(circle)
+        plt.gca().set_aspect('equal')
+        plt.subplots_adjust(left=0.1, bottom=0.1, right=0.75)
+        st.pyplot(fig1)
+        #Ratings bar chart
+        st.markdown("""<h4 style="text-align: center;">Average Rating of Genres</h4><p style="text-align: center;"></p>""", unsafe_allow_html=True)
+        df_genre_rating = pd.read_csv("resources/data/df_genres_average_ratings.csv")
+        fig=px.bar(df_genre_rating,x='Rating',y='Genres', orientation='h')
+        fig.update_traces(marker_color='deepskyblue',  # Change the bar color
+                      textfont_color='black',  # Change the label text color
+                      hovertemplate='<b>Genre: %{y}</b><br><b>Rating: %{x}</b>',  # Change the tooltip text
+                      selector=dict(type='bar'))  # Select only the bar traces
+        st.write(fig)
+        #Directors
+        #directors data frame
+        directors = pd.read_csv("resources/data/df_top_directors.csv", encoding = "latin_1")
+        st.subheader("Best and worst performing directors")
+        #Best Directors
+        st.markdown("""<h4 style="text-align: center;">Best Rated Directors</h4><p style="text-align: center;"></p>""", unsafe_allow_html=True)
+        fig_top_directors=px.bar(directors.head(25),x='Rating',y='Director', orientation='h')
+        fig_top_directors.update_traces(marker_color='yellowgreen',  # Change the bar color
+                      textfont_color='black',  # Change the label text color
+                      hovertemplate='<b>Director Name: %{y}</b><br><b>Rating: %{x}</b>',  # Change the tooltip text
+                      selector=dict(type='bar'))  # Select only the bar traces
+        st.write(fig_top_directors)
+        #Worst Directors
+
+        st.markdown("""<h4 style="text-align: center;">Worst Rated Directors</h4><p style="text-align: center;"></p>""", unsafe_allow_html=True)
+        fig_worst_directors=px.bar(directors.tail(25),x='Rating',y='Director', orientation='h')
+        fig_worst_directors.update_traces(marker_color='lightcoral',  # Change the bar color
+                      textfont_color='black',  # Change the label text color
+                      hovertemplate='<b>Director Name: %{y}</b><br><b>Rating: %{x}</b>',  # Change the tooltip text
+                      selector=dict(type='bar'))  # Select only the bar traces
+        st.write(fig_worst_directors)
+
+
+
+        #Actors
+        
+        st.subheader("Best and worst performing actors")
+        actors_df = pd.read_csv("resources/data/actor_ratings_to_plot.csv", encoding = "latin_1")
+        best_actors = actors_df.head(30)
+        worst_actors = actors_df.tail(30)
+        
+        st.markdown("""<h4 style="text-align: center;">Best Perfoming Actors</h4><p style="text-align: center;"></p>""", unsafe_allow_html=True)
+        fig_top_actors=px.bar(best_actors,x='Average Actor Rating',y='Actor', orientation='h')
+        fig_top_actors.update_traces(marker_color='green',  # Change the bar color
+                      textfont_color='black',  # Change the label text color
+                      hovertemplate='<b>Actor Name: %{y}</b><br><b>Rating: %{x}</b>',  # Change the tooltip text
+                      selector=dict(type='bar'))  # Select only the bar traces
+        st.write(fig_top_actors)
+
+
+        st.markdown("""<h4 style="text-align: center;">Worst Perfoming Actors</h4><p style="text-align: center;"></p>""", unsafe_allow_html=True)
+        fig_worst_actors=px.bar(worst_actors,x='Average Actor Rating',y='Actor', orientation='h')
+        fig_worst_actors.update_traces(marker_color='red',  # Change the bar color
+                      textfont_color='black',  # Change the label text color
+                      hovertemplate='<b>Actor Name: %{y}</b><br><b>Rating: %{x}</b>',  # Change the tooltip text
+                      selector=dict(type='bar'))  # Select only the bar traces
+        st.write(fig_worst_actors)
+
+
 
 if __name__ == '__main__':
     main()
