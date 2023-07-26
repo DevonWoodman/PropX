@@ -28,6 +28,8 @@
 """
 # Streamlit dependencies
 import streamlit as st
+import nltk
+nltk.download('stopwords')
 
 # Script dependencies
 import os
