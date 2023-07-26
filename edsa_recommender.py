@@ -111,9 +111,9 @@ def main():
 
         # User-based preferences
         st.write('### Enter Your Three Favorite Movies')
-        movie_1 = st.selectbox('Fisrt Option',title_list[:3000])
-        movie_2 = st.selectbox('Second Option',title_list[:3000])
-        movie_3 = st.selectbox('Third Option',title_list[:3000])
+        movie_1 = st.selectbox('Fisrt Option',title_list[:])
+        movie_2 = st.selectbox('Second Option',title_list[:])
+        movie_3 = st.selectbox('Third Option',title_list[:])
         fav_movies = [movie_1,movie_2,movie_3]
 
         # Perform top-10 movie recommendation generation
@@ -177,9 +177,9 @@ def main():
             st.write('**Competitive Advantage:**')
             st.write('''In today's competitive landscape, a well-implemented recommender system can serve as a differentiating factor for platforms. By providing accurate and personalized recommendations, platforms can attract new users and retain existing ones, positioning themselves as leaders in the industry. This competitive advantage can result in increased market share, brand recognition, and growth opportunities.''')
         st.header('Solution')
-        st.write('''The ReelDeal Presents: Your Ultimate Movie Recommender App!
+        st.write('''The ReelDeal: Your Ultimate Movie Recommender App!
 
-Are you tired of endlessly scrolling through streaming platforms, trying to find the perfect movie to watch? Look no further! The ReelDeal is here to revolutionize your movie-watching experience with its advanced recommendation system that caters for collaborative filtering and content filtering techniques.''')
+Are you tired of endlessly scrolling through streaming platforms, trying to find the perfect movie to watch? Look no further! The ReelDeal is here to revolutionize your movie-watching experience with its advanced recommendation system that caters for collaborative and content filtering techniques.''')
         
         tab1, tab2 = st.tabs(["Content Filtering", "Colaborative Filtering"])
 
@@ -209,13 +209,7 @@ Are you tired of endlessly scrolling through streaming platforms, trying to find
                 st.divider()
                 st.write('''**Disadvantages:**''')
                 st.write('''1. Collaborative filtering models face challenges when recommending new items, as they lack user-item interactions, resulting in the "cold start problem."''')
-                st.write('''2. Memory-based algorithms tend to perform poorly on highly sparse datasets, where data points are limited or missing.''')
-        
-        st.write('''Here are some key features of the app:''')
-        with st.expander("**Key Features**"):
-            st.write("")
-            st.write('''Personalized Recommendations: The app understands your unique preferences and delivers personalized movie recommendations that suit your taste, making it easier for you to discover new films that you'll love.''')
-        
+                st.write('''2. Memory-based algorithms tend to perform poorly on highly sparse datasets, where data points are limited or missing.''')        
         
         st.write('''The ReelDeal's app is the ultimate movie companion that brings the power of collaborative filtering and content filtering together, ensuring that you never run out of fantastic movies to watch. Say goodbye to endless scrolling and start enjoying personalized movie recommendations today!''')
 
@@ -339,8 +333,9 @@ Are you tired of endlessly scrolling through streaming platforms, trying to find
     if page_selection == "Recommender Settings":
         st.title('Settings')
         if 'model' not in st.session_state:
-            st.session_state['model'] = 'SVD'
+            st.session_state.search_1 = 'SVD'
+            st.session_state['model'] = st.selectbox('Select Recommender Model Type',('SVD', 'NMF', 'CoCluster'), key='search_1')
         else:
-            st.session_state['model'] = st.selectbox('Select Recommender Model Type',('SVD', 'NMF', 'CoCluster'))
+            st.session_state['model'] = st.selectbox('Select Recommender Model Type',('SVD', 'NMF', 'CoCluster'), key='search_1')
 if __name__ == '__main__':
     main()
