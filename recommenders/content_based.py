@@ -398,7 +398,7 @@ def content_model(movie_list,top_n=10):
     """
     # Initializing the empty list of recommended movies
     recommended_movies = []
-    data = data_preprocessing(3000)
+    data = data_preprocessing(20000)
     
     print('Preprocessing Complete')
     
