@@ -39,6 +39,8 @@ from recommenders.content_based import content_model
 import base64
 from pathlib import Path
 
+st.session_state.model = 'SVD'
+
 # styling
 app_style = """
 <style>
