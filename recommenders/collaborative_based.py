@@ -26,6 +26,8 @@
     filtering algorithm for rating predictions on Movie data.
 
 """
+# Streamlit dependencies
+import streamlit as st
 
 # Script dependencies
 import pandas as pd
@@ -38,12 +40,18 @@ from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.feature_extraction.text import CountVectorizer
 
 # Importing data
-movies_df = pd.read_csv('resources/data/movies.csv',sep = ',')
-ratings_df = pd.read_csv('resources/data/ratings.csv')
+movies_df = pd.read_csv('/home/explore-student/unsupervised_data/edsa-movie-recommendation-predict/movies.csv',sep = ',')
+ratings_df = pd.read_csv('/home/explore-student/unsupervised_data/edsa-movie-recommendation-predict/train.csv')
+
+# movies_df = pd.read_csv('movies.csv',sep = ',')
+# ratings_df = pd.read_csv('train.csv')
 ratings_df.drop(['timestamp'], axis=1,inplace=True)
 
 # We make use of an SVD model trained on a subset of the MovieLens 10k dataset.
-model=pickle.load(open('resources/models/SVD.pkl', 'rb'))
+model1=pickle.load(open('resources/models/SVD.pkl', 'rb'))
+model2=pickle.load(open('resources/models/NMF.pkl', 'rb'))
+model3=pickle.load(open('resources/models/CoCluster.pkl', 'rb'))
+
 
 def prediction_item(item_id):
     """Map a given favourite movie to users within the
@@ -64,6 +72,16 @@ def prediction_item(item_id):
     reader = Reader(rating_scale=(0, 5))
     load_df = Dataset.load_from_df(ratings_df,reader)
     a_train = load_df.build_full_trainset()
+    
+    if st.session_state.model == 'SVD':
+        model = model1
+        print('1')
+    elif st.session_state.model == 'NMF':
+        model = model2
+        print('2')
+    else:
+        model = model3
+        print('3')
 
     predictions = []
     for ui in a_train.all_users():
@@ -122,7 +140,8 @@ def collab_model(movie_list,top_n=10):
     movie_ids = pred_movies(movie_list)
     df_init_users = ratings_df[ratings_df['userId']==movie_ids[0]]
     for i in movie_ids :
-        df_init_users=df_init_users.append(ratings_df[ratings_df['userId']==i])
+        #df_init_users=df_init_users.append(ratings_df[ratings_df['userId']==i])
+        df_init_users=pd.concat([df_init_users, ratings_df[ratings_df['userId']==i]])
     # Getting the cosine similarity matrix
     cosine_sim = cosine_similarity(np.array(df_init_users), np.array(df_init_users))
     idx_1 = indices[indices == movie_list[0]].index[0]
@@ -137,7 +156,8 @@ def collab_model(movie_list,top_n=10):
     score_series_2 = pd.Series(rank_2).sort_values(ascending = False)
     score_series_3 = pd.Series(rank_3).sort_values(ascending = False)
      # Appending the names of movies
-    listings = score_series_1.append(score_series_1).append(score_series_3).sort_values(ascending = False)
+    #listings = score_series_1.append(score_series_1).append(score_series_3).sort_values(ascending = False)
+    listings = pd.concat([score_series_1, score_series_2, score_series_3])
     recommended_movies = []
     # Choose top 50
     top_50_indexes = list(listings.iloc[1:50].index)
