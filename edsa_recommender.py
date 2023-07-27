@@ -84,7 +84,14 @@ def add_bg_from_local(image_file):
 
 # Data Loading
 title_list = load_movie_titles('/home/explore-student/unsupervised_data/edsa-movie-recommendation-predict/movies.csv')
-#title_list = load_movie_titles('movies.csv')
+hist_data = pd.read_csv('/home/explore-student/unsupervised_data/edsa-movie-recommendation-predict/train.csv')
+# title_list = load_movie_titles('movies.csv')
+# hist_data = pd.read_csv('train.csv')
+df_ratings = pd.read_csv('resources/data/df_ratings.csv', encoding = "latin_1")
+df_genre_freq = pd.read_csv("resources/data/PieChartData.csv")
+df_genre_rating = pd.read_csv("resources/data/df_genres_average_ratings.csv")
+actors_df = pd.read_csv("resources/data/actor_ratings_to_plot.csv", encoding = "latin_1")
+
 
 # App declaration
 def main():
@@ -337,14 +344,12 @@ Are you tired of endlessly scrolling through streaming platforms, trying to find
         st.title("Uncovering Data Insights")
         #Movie ratings Histogram
         st.markdown("""<h4 style="text-align: center;">Movie Ratings Distribution</h4><p style="text-align: center;"></p>""", unsafe_allow_html=True)
-        hist_data = pd.read_csv('resources/data/train.csv')
         
         fig, ax = plt.subplots()
         ax.hist(hist_data['rating'],rwidth=0.99,color = "Purple")
         st.pyplot(fig)
         
         st.subheader("Most Rated Overall Movies")
-        df_ratings = pd.read_csv('resources/data/df_ratings.csv', encoding = "latin_1")
         top_movies = df_ratings.head(25)
         bottom_movies = df_ratings.tail(25)
 
@@ -359,7 +364,6 @@ Are you tired of endlessly scrolling through streaming platforms, trying to find
         st.subheader("Genre Distribution and Average ratings")
         #Donut Chart
         st.markdown("""<h4 style="text-align: center;">Genre Distribution</h4><p style="text-align: center;"></p>""", unsafe_allow_html=True)
-        df_genre_freq = pd.read_csv("resources/data/PieChartData.csv")
         labels = df_genre_freq["Genres"]
         sizes = df_genre_freq["Frequency"]
         fig1, ax1 = plt.subplots()
@@ -374,7 +378,6 @@ Are you tired of endlessly scrolling through streaming platforms, trying to find
         st.pyplot(fig1)
         #Ratings bar chart
         st.markdown("""<h4 style="text-align: center;">Average Rating of Genres</h4><p style="text-align: center;"></p>""", unsafe_allow_html=True)
-        df_genre_rating = pd.read_csv("resources/data/df_genres_average_ratings.csv")
         fig=px.bar(df_genre_rating,x='Rating',y='Genres', orientation='h')
         fig.update_traces(marker_color='deepskyblue',  # Change the bar color
                       textfont_color='black',  # Change the label text color
@@ -408,7 +411,6 @@ Are you tired of endlessly scrolling through streaming platforms, trying to find
         #Actors
         
         st.subheader("Best and worst performing actors")
-        actors_df = pd.read_csv("resources/data/actor_ratings_to_plot.csv", encoding = "latin_1")
         best_actors = actors_df.head(30)
         worst_actors = actors_df.tail(30)
         
