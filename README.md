@@ -1,6 +1,5 @@
 # Streamlit-based Recommender System
-#### EXPLORE Data Science Academy Unsupervised Predict
-
+#### PropX Proof of Concept
 ## 1) Overview
 
 ![Movie_Recommendations](resources/imgs/Image_header.png)
